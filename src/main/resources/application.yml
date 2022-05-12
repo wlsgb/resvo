@@ -1,0 +1,28 @@
+server:
+  address: localhost
+  port: 8080
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/resvo?useSSL=false&characterEncoding=UTF-8&serverTimezone=UTC
+    username: resvo
+    password: 1234
+
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    properties:
+      hibernate:
+        # 하이버네이트가 실행한 모든 SQL 문을 console 로 출력
+        show_sql: true
+        # SQL 문을 가독성 있게 표현
+        format_sql: true
+        # 디버깅 정보 출력
+        use_sql_comments: true
+
+logging:
+  level:
+    org:
+      hibernate: info
+
