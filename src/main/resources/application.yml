@@ -5,9 +5,13 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/resvo?useSSL=false&characterEncoding=UTF-8&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/resvo?useSSL=false&characterEncoding=UTF-8&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: resvo
     password: 1234
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher # swagger 버전 오류 방지
 
   jpa:
     database: mysql
