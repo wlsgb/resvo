@@ -20,23 +20,21 @@ repositories {
 
 dependencies {
     // spring-boot
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-
-    // lombok
-    compileOnly 'org.projectlombok:lombok:1.18.24'
-    annotationProcessor 'org.projectlombok:lombok:1.18.24'
-
+    implementation group: 'org.springframework.boot', name: 'spring-boot-devtools', version: '2.6.7'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.6.7'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.6.7'
+    // security
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.6.7'
+    // JPA
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '2.6.7'
     // MySQL
     implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.28'
-    // JPA
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '2.3.12.RELEASE'
-    // h2
-    testImplementation group: 'com.h2database', name: 'h2', version: '2.1.212'
-
-
+    // swagger
+    implementation group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'
+    implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '3.0.0'
+    // lombok
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
 }
 
 tasks.named('test') {
