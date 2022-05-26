@@ -16,6 +16,8 @@ spring:
   jpa:
     database: mysql
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    hibernate:
+      ddl-auto: update
     properties:
       hibernate:
         # 하이버네이트가 실행한 모든 SQL 문을 console 로 출력
@@ -29,4 +31,9 @@ logging:
   level:
     org:
       hibernate: info
+
+globals:
+      jwt:
+        secret-key: resvo12#$56
+        expiration: 604800000
 
