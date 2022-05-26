@@ -5,7 +5,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.boot.resvo.member.code.MemberMessage;
+import com.boot.resvo.member.code.AuthMessage;
 import com.boot.resvo.member.service.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -19,6 +19,6 @@ public class CustomUserDetailService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		return memberRepository.findByEmail(username)
-			.orElseThrow(() -> new IllegalArgumentException(MemberMessage.MEMBER_NOT_EXIST.getMessage()));
+			.orElseThrow(() -> new IllegalArgumentException(AuthMessage.MEMBER_NOT_EXIST.getMessage()));
 	}
 }

@@ -8,7 +8,7 @@ import java.util.Optional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.boot.resvo.member.code.MemberMessage;
+import com.boot.resvo.member.code.AuthMessage;
 import com.boot.resvo.member.model.MemberEntity;
 import com.boot.resvo.member.model.SignResponseDTO;
 import com.boot.resvo.utils.StrUtil;
@@ -35,14 +35,14 @@ public class AuthService {
 
 		// Email 중복 점검
 		if (memberService.hasMemberByEmail(member.getEmail()))
-			return fail(MemberMessage.EMAIL_ALREADY_EXIST);
+			return fail(AuthMessage.EMAIL_ALREADY_EXIST);
 
 		// 패스워드
 		String password = member.getPassword();
 
 		// 패스워드 검증
 		if (!validationPassword(password))
-			return fail(MemberMessage.PASSWORD_NOT_POLICY);
+			return fail(AuthMessage.PASSWORD_NOT_POLICY);
 
 		// 패스워드 설정
 		member.setPassword(passwordEncoder.encode(member.getPassword()));
@@ -56,7 +56,7 @@ public class AuthService {
 		MemberEntity memberEntity = memberService.saveMember(member);
 
 		// 결과값 반환
-		return success(memberEntity, MemberMessage.SIGN_UP_SUCCESS);
+		return success(memberEntity, AuthMessage.SIGN_UP_SUCCESS);
 	}
 
 	/**
@@ -69,16 +69,16 @@ public class AuthService {
 
 		// 이메일이 존재하지 않는 경우
 		if (!optiMember.isPresent())
-			return fail(MemberMessage.EMAIL_NOT_EXIST);
+			return fail(AuthMessage.EMAIL_NOT_EXIST);
 
 		// 회원 정보
 		MemberEntity member = optiMember.get();
 
 		// 패스워드가 틀린 경우
 		if (!passwordEncoder.matches(password, member.getPassword()))
-			return fail(MemberMessage.PASSWORD_IS_INVALID);
+			return fail(AuthMessage.PASSWORD_IS_INVALID);
 
-		return success(member, MemberMessage.SIGN_IN_SUCCESS);
+		return success(member, AuthMessage.SIGN_IN_SUCCESS);
 	}
 
 	/**
@@ -90,21 +90,21 @@ public class AuthService {
 
 		// 회원 존재 여부 확인
 		if (!optiMember.isPresent())
-			return fail(MemberMessage.MEMBER_NOT_EXIST);
+			return fail(AuthMessage.MEMBER_NOT_EXIST);
 
 		// 회원
 		MemberEntity member = optiMember.get();
 
 		// 패스워드 검증
 		if (!validationPassword(password))
-			return fail(MemberMessage.PASSWORD_NOT_POLICY);
+			return fail(AuthMessage.PASSWORD_NOT_POLICY);
 
 		// 암호화된 패스워드
 		String encodePassword = passwordEncoder.encode(password);
 
 		// 기존 패스워드와 동일한 경우
 		if (encodePassword.equals(member.getPassword()))
-			return fail(MemberMessage.SAME_EXIST_PASSWORD);
+			return fail(AuthMessage.SAME_EXIST_PASSWORD);
 
 		// 패스워드 설정
 		member.setPassword(encodePassword);
@@ -114,7 +114,7 @@ public class AuthService {
 		// 회원 수정
 		MemberEntity memberEntity = memberService.saveMember(member);
 
-		return success(memberEntity, MemberMessage.MEMBER_MODIFY_SUCCESS);
+		return success(memberEntity, AuthMessage.MEMBER_MODIFY_SUCCESS);
 	}
 
 	/**
@@ -123,7 +123,7 @@ public class AuthService {
 	 * @param message 메세지
 	 * @return
 	 */
-	private SignResponseDTO success(MemberEntity memberEntity, MemberMessage message) {
+	private SignResponseDTO success(MemberEntity memberEntity, AuthMessage message) {
 		return SignResponseDTO.builder()
 			.memberEntity(memberEntity)
 			.message(message)
@@ -136,7 +136,7 @@ public class AuthService {
 	 * @param message 메세지
 	 * @return
 	 */
-	private SignResponseDTO fail(MemberMessage message) {
+	private SignResponseDTO fail(AuthMessage message) {
 		return SignResponseDTO.builder()
 			.message(message)
 			.successYN(false)
