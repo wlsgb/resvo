@@ -1,6 +1,8 @@
 package com.boot.resvo.member.service;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -36,16 +38,19 @@ public class AuthService {
 			return fail(MemberMessage.EMAIL_ALREADY_EXIST);
 
 		// 패스워드
-		String password = member.getPassward();
+		String password = member.getPassword();
 
 		// 패스워드 검증
 		if (!validationPassword(password))
 			return fail(MemberMessage.PASSWORD_NOT_POLICY);
 
 		// 패스워드 설정
-		member.setPassward(passwordEncoder.encode(member.getPassward()));
+		member.setPassword(passwordEncoder.encode(member.getPassword()));
 		// 가입 날짜 설정
 		member.setRegtDate(new Date());
+		List<String> role = Collections.singletonList("ROLE_USER");
+		// 권한 설정
+		member.setRoles(Collections.singletonList("ROLE_USER"));
 
 		// 회원 저장
 		MemberEntity memberEntity = memberService.saveMember(member);
@@ -70,7 +75,7 @@ public class AuthService {
 		MemberEntity member = optiMember.get();
 
 		// 패스워드가 틀린 경우
-		if (!passwordEncoder.matches(password, member.getPassward()))
+		if (!passwordEncoder.matches(password, member.getPassword()))
 			return fail(MemberMessage.PASSWORD_IS_INVALID);
 
 		return success(member, MemberMessage.SIGN_IN_SUCCESS);
@@ -98,11 +103,11 @@ public class AuthService {
 		String encodePassword = passwordEncoder.encode(password);
 
 		// 기존 패스워드와 동일한 경우
-		if (encodePassword.equals(member.getPassward()))
+		if (encodePassword.equals(member.getPassword()))
 			return fail(MemberMessage.SAME_EXIST_PASSWORD);
 
 		// 패스워드 설정
-		member.setPassward(encodePassword);
+		member.setPassword(encodePassword);
 		// 수정 날짜 설정
 		member.setUpdtDate(new Date());
 
@@ -145,7 +150,7 @@ public class AuthService {
 	 * @return
 	 */
 	private boolean equalsPassword(MemberEntity member, String password) {
-		return passwordEncoder.matches(password, member.getPassward());
+		return passwordEncoder.matches(password, member.getPassword());
 	}
 
 	/**
