@@ -3,28 +3,28 @@ package com.boot.resvo.member.service;
 import java.util.Date;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.boot.resvo.member.code.MemberMessage;
 import com.boot.resvo.member.model.MemberEntity;
 import com.boot.resvo.member.model.SignResponseDTO;
 import com.boot.resvo.utils.StrUtil;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 회원 가입 관련 서비스
+ * 인증 관련 서비스
  */
 @Slf4j
+@RequiredArgsConstructor
 @Service
-public class SignService {
+public class AuthService {
 
-	@Autowired
-	private MemberService memberService;
+	private final MemberService memberService;
 
-	@Autowired
-	private PasswordEncoder passwordEncoder;
+	private final PasswordEncoder passwordEncoder;
 
 	/**
 	 * 회원 가입
@@ -33,14 +33,14 @@ public class SignService {
 
 		// Email 중복 점검
 		if (memberService.hasMemberByEmail(member.getEmail()))
-			return fail("해당 Email 은 이미 존재합니다.");
+			return fail(MemberMessage.EMAIL_ALREADY_EXIST);
 
 		// 패스워드
 		String password = member.getPassward();
 
 		// 패스워드 검증
 		if (!validationPassword(password))
-			return fail("패스워드 정책에 맞지 않습니다.");
+			return fail(MemberMessage.PASSWORD_NOT_POLICY);
 
 		// 패스워드 설정
 		member.setPassward(passwordEncoder.encode(member.getPassward()));
@@ -51,7 +51,7 @@ public class SignService {
 		MemberEntity memberEntity = memberService.saveMember(member);
 
 		// 결과값 반환
-		return success(memberEntity, "회원가입에 성공하였습니다.");
+		return success(memberEntity, MemberMessage.SIGN_UP_SUCCESS);
 	}
 
 	/**
@@ -64,16 +64,16 @@ public class SignService {
 
 		// 이메일이 존재하지 않는 경우
 		if (!optiMember.isPresent())
-			return fail("이메일이 존재하지 않습니다.");
+			return fail(MemberMessage.EMAIL_NOT_EXIST);
 
 		// 회원 정보
 		MemberEntity member = optiMember.get();
 
 		// 패스워드가 틀린 경우
-		if (!equalsPassword(member, password))
-			return fail("패스워드가 틀렸습니다.");
+		if (!passwordEncoder.matches(password, member.getPassward()))
+			return fail(MemberMessage.PASSWORD_IS_INVALID);
 
-		return success(member, "로그인에 성공하였습니다.");
+		return success(member, MemberMessage.SIGN_IN_SUCCESS);
 	}
 
 	/**
@@ -85,21 +85,21 @@ public class SignService {
 
 		// 회원 존재 여부 확인
 		if (!optiMember.isPresent())
-			return fail("회원이 존재하지 않습니다.");
+			return fail(MemberMessage.MEMBER_NOT_EXIST);
 
 		// 회원
 		MemberEntity member = optiMember.get();
 
 		// 패스워드 검증
 		if (!validationPassword(password))
-			return fail("패스워드 정책과 맞지 않습니다.");
+			return fail(MemberMessage.PASSWORD_NOT_POLICY);
 
 		// 암호화된 패스워드
 		String encodePassword = passwordEncoder.encode(password);
 
 		// 기존 패스워드와 동일한 경우
 		if (encodePassword.equals(member.getPassward()))
-			return fail("기존 패스워드와 동일합니다.");
+			return fail(MemberMessage.SAME_EXIST_PASSWORD);
 
 		// 패스워드 설정
 		member.setPassward(encodePassword);
@@ -109,31 +109,31 @@ public class SignService {
 		// 회원 수정
 		MemberEntity memberEntity = memberService.saveMember(member);
 
-		return success(memberEntity, "회원 수정에 성공하였습니다.");
+		return success(memberEntity, MemberMessage.MEMBER_MODIFY_SUCCESS);
 	}
 
 	/**
 	 * 성공한 경우
 	 * @param memberEntity 회원
-	 * @param msg 메세지
+	 * @param message 메세지
 	 * @return
 	 */
-	private SignResponseDTO success(MemberEntity memberEntity, String msg) {
+	private SignResponseDTO success(MemberEntity memberEntity, MemberMessage message) {
 		return SignResponseDTO.builder()
 			.memberEntity(memberEntity)
-			.msg(msg)
+			.message(message)
 			.successYN(true)
 			.build();
 	}
 
 	/**
 	 * 실패한 경우
-	 * @param msg 메세지
+	 * @param message 메세지
 	 * @return
 	 */
-	private SignResponseDTO fail(String msg) {
+	private SignResponseDTO fail(MemberMessage message) {
 		return SignResponseDTO.builder()
-			.msg(msg)
+			.message(message)
 			.successYN(false)
 			.build();
 	}
@@ -145,7 +145,7 @@ public class SignService {
 	 * @return
 	 */
 	private boolean equalsPassword(MemberEntity member, String password) {
-		return member.getPassward().equals(passwordEncoder.encode(password));
+		return passwordEncoder.matches(password, member.getPassward());
 	}
 
 	/**
